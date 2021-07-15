@@ -15,7 +15,7 @@ Follow this [guide](https://shawnhymel.com/2096/how-to-set-up-raspberry-pi-pico-
 
 <a name="b"></a>
 ## The Circuit
-The Circuit is pretty simple, it is composed of A lowpass filter at bout 20 KHz and a decoupling capactitor to removed the DC offset. The Output voltage is 1.6V peak-peak. this can be made approximately 1.1V peak to peak in software if that is preferable. 
+The Circuit is pretty simple, it is composed of A lowpass filter at bout 20 KHz and a decoupling capactitor to removed the DC offset. The Output voltage is 1.6V peak-peak. This can be made approximately 1.1V peak to peak in software if that is preferable. 
 
 <p align="center">
  <img src="readme/circuit (2).png" width="600" />
