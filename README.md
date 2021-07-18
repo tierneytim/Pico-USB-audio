@@ -1,12 +1,17 @@
 # Pico-USB-audio
 This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It then uses a 4th order pulse density modulator to output audio through the Pico's Programmable Input Outputs (PIO). It only requires two resistors and two capacitors to output pretty good audio. This will eventaully transition into an Aruduino library but in the meantime I will attempt to provide cmake files and UF2 files. Check out the video below
 
+
 <p align="center">
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/kuy6rja3Azc/0.jpg)](https://www.youtube.com/watch?v=kuy6rja3Azc) 
 
 </p>
 
+## Table of contents
+1. [Building](#a)
+2. [The Circuit](#b)
+3. [Arduino](#c)
 
 <a name="a"></a>
 ## Building
@@ -27,3 +32,7 @@ and in reality it looks like this.
  <img src="README/realCircuit.jpg" width="600" />
 </p>
 
+
+<a name="c"></a>
+## Arduino mbed version
+An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Then run the code in the [mbedUSB folder](mbedUSB/mbedUSB.ino)
