@@ -1,5 +1,5 @@
 # Pico-USB-audio
-This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It then uses a 4th order pulse density modulator to output audio through the Pico's Programmable Input Outputs (PIO). It only requires two resistors and two capacitors to output pretty good audio. This will eventaully transition into an Aruduino library but in the meantime I will attempt to provide cmake files and UF2 files. Check out the video below
+This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It then uses a 4th order pulse density modulator to output audio through the Pico's Programmable Input Outputs (PIO). It only requires two resistors and two capacitors to output pretty good audio. Check out the video below. 
 
 
 <p align="center">
@@ -9,14 +9,13 @@ This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It th
 </p>
 
 ## Table of contents
-1. [Building](#a)
+1. [Arduino Code](#a)
 2. [The Circuit](#b)
-3. [Arduino](#c)
+3. [Building for pico-sdk](#c)
 
 <a name="a"></a>
-## Building
-I'm a Cmake Noob, so apologies in advance if the Cmake stuff doesn't work. If it doesn't please contribute better code. There is a [UF2 file](build) in the build folder if you want to just see what the library can do. Hold down the BOOTSEL button on the PICO, plug in over USB and then drag and drop the UF2 file into the drive that appears. 
-Follow this [guide](https://shawnhymel.com/2096/how-to-set-up-raspberry-pi-pico-c-c-toolchain-on-windows-with-vs-code/#Update_Environment_Variables) if you're building on windows. This is currently outlandishly complicated. If you want to help me wrap this into an arduino library please contribute some code. 
+## Arduino mbed version
+An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Then run the code in the [mbedUSB folder](mbedUSB/mbedUSB.ino).
 
 <a name="b"></a>
 ## The Circuit
@@ -34,5 +33,6 @@ and in reality it looks like this.
 
 
 <a name="c"></a>
-## Arduino mbed version
-An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Then run the code in the [mbedUSB folder](mbedUSB/mbedUSB.ino)
+# Building for pico-sdk
+I'm a Cmake Noob, so apologies in advance if the Cmake stuff doesn't work. If it doesn't please contribute better code. There is a [UF2 file](build) in the build folder if you want to just see what the library can do. Hold down the BOOTSEL button on the PICO, plug in over USB and then drag and drop the UF2 file into the drive that appears. 
+Follow this [guide](https://shawnhymel.com/2096/how-to-set-up-raspberry-pi-pico-c-c-toolchain-on-windows-with-vs-code/#Update_Environment_Variables) if you're building on windows. This is currently outlandishly complicated. If you want to help me simplify then please contribute.
