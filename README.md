@@ -15,7 +15,7 @@ This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It th
 
 <a name="a"></a>
 ## Arduino mbed version
-An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Then run the code in the [mbedUSB folder](mbedUSB/mbedUSB.ino).
+An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Then run the code in the [mbedUSB folder](mbedUSB/mbedUSB.ino) or install the [Arduino library](SDM) in your Arduino libraries folder
 
 <p align="center">
  <img src="README/board managerSearch.PNG" width="600" />
