@@ -4,6 +4,8 @@
 #include "hardware/pll.h"
 #include "hardware/clocks.h"
 #include "pico/multicore.h"
+#include "Serial.h"
+#include "SDM.h"
 
 void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
   if (!running_on_fpga()) {
@@ -81,7 +83,7 @@ void core1_worker() {
     pdm_write32(a, pio, sm);
     pdm_write32(a, pio, sm);
   }
-
+  SDM sdm;
 
   while (1) {
     if (pio_sm_is_tx_fifo_empty(pio, sm)) {
@@ -97,7 +99,9 @@ void core1_worker() {
     if (multicore_fifo_rvalid()) {
       uint32_t rec = multicore_fifo_pop_blocking();
       pinput = (int16_t)(rec);
-      a = pdm_4_os32(pinput);
+      //a = pdm_4_os32(pinput);
+      a = sdm.o4_os32(pinput);
+
       while (pio_sm_is_tx_fifo_full(pio, sm)) {}
       pio->txf[sm] = a;
     }
@@ -108,20 +112,20 @@ void core1_worker() {
 
 
 void setup() {
-  //Audio object
-  USBAudio audio(true, 48000, 2, 48000, 2);
-
   // less noisy power supply
   _gpio_init(23);
   gpio_set_dir(23, GPIO_OUT);
   gpio_put(23, 1);
   _gpio_init(25);
   gpio_set_dir(25, GPIO_OUT);
+
   // Set the appropriate clock
   set_sys_clock_khz(115200, false);
   uint offset = pio_add_program(pio, &pdm_program);
   sm = pio_claim_unused_sm(pio, true);
   pdm_program_init(pio, sm, offset, 14, 115200 * 1000 / (48000.0 * 32));
+
+  USBAudio audio(true, 48000, 2, 48000, 2);
 
   // variables
   static uint8_t buf[64];
