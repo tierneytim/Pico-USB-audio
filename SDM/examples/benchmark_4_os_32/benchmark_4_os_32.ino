@@ -12,7 +12,7 @@ void setup() {
   uint32_t newClock = 153600;
   set_sys_clock_khz(newClock, false);
 
- //begin serial after clocks set
+  //begin serial after clocks set
   Serial.begin(115200);
   Serial.println("hello");
 
@@ -21,14 +21,13 @@ void setup() {
     sig[i - 1] = (int16_t)(sin(2.0 * PI * 1000 * i / sampleRate) * 32767 * 1);
   }
 
-  uint32_t result;
-  uint32_t beg;
+  volatile uint32_t result;
   uint32_t end;
-
+  uint32_t beg;
   // the class
   SDM sdm;
 
-  // first run
+  // direct  form 1
   beg = micros();
   for (uint16_t i = 0; i < sampleRate; i++) {
     result = sdm.o4_os32(sig[i]);
@@ -36,16 +35,15 @@ void setup() {
   end = micros();
   Serial.println(end - beg);
 
-  // second run is so to ensure compiler doesnt optimise caculations away;
+
+  // direct form 2;
   beg = micros();
   for (uint16_t i = 0; i < sampleRate; i++) {
-    result = sdm.o4_os32(sig[i]);
+    result = sdm.o4_os32_df2(sig[i]);
   }
   end = micros();
   Serial.println(end - beg);
-  
 }
 
-void loop(){
-    
+void loop() {
 }

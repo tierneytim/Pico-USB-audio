@@ -11,23 +11,22 @@ uint sm;
 void core1_worker() {
   uint32_t a = 0;
   int16_t pinput = 0;
-
   SDM sdm;
-  
+
   while (1) {
     //if fifo empty modulate the previous value to keep voltage constant
     // helps prevents clicks and pops I think
 
     if (pio_sm_is_tx_fifo_empty(pio, sm)) {
-      pio->txf[sm] = sdm.o4_os32(pinput);
+      pio->txf[sm] = sdm.o4_os32_df2(pinput);
     }
     // if other core sends value
     if (multicore_fifo_rvalid()) {
       uint32_t rec = multicore_fifo_pop_blocking();
-      
+
       //save previous value so we can stuff buffer with it if music paused.
       pinput = (int16_t)(rec);
-      a = sdm.o4_os32(pinput);
+      a = sdm.o4_os32_df2(pinput);
 
       //write to state PIO when its not full
       while (pio_sm_is_tx_fifo_full(pio, sm)) {}
@@ -76,15 +75,15 @@ void setup() {
         outR = *in;
         in++;
         //mono value
-        mono = (outL + outR) / 2;   
+        mono = (outL + outR) / 2;
         multicore_fifo_push_blocking((uint32_t)(mono));
         // save previous value in case we need to stuff buffer
-        pmono=mono;
+        pmono = mono;
       }
     } else {
       // basically if you havent read anything stuff buffer with previous value
-       multicore_fifo_push_blocking((uint32_t)(pmono));
-      }
+      multicore_fifo_push_blocking((uint32_t)(pmono));
+    }
   }
 }
 
