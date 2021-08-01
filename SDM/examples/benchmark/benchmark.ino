@@ -8,8 +8,8 @@ int16_t sig[sampleRate];
 
 void setup() {
 
-  // set new clock that is intger multiple of 48000*32
-  uint32_t newClock = 153600;
+  // set new clock that is intger multiple of 48000*64
+  uint32_t newClock = 230400;
   set_sys_clock_khz(newClock, false);
 
   //begin serial after clocks set
@@ -27,13 +27,6 @@ void setup() {
   // the class
   SDM sdm;
 
-  // direct  form 1
-  beg = micros();
-  for (uint16_t i = 0; i < sampleRate; i++) {
-    result = sdm.o4_os32(sig[i]);
-  }
-  end = micros();
-  Serial.println(end - beg);
 
 
   // direct form 2;
@@ -41,8 +34,26 @@ void setup() {
   for (uint16_t i = 0; i < sampleRate; i++) {
     result = sdm.o4_os32_df2(sig[i]);
   }
-  end = micros();
-  Serial.println(end - beg);
+  Serial.println(micros() - beg);
+
+  // direct  form 1
+  beg = micros();
+  for (uint16_t i = 0; i < sampleRate; i++) {
+    result = sdm.o4_os32(sig[i]);
+  }
+  Serial.println(micros() - beg);
+
+  // direct  form 2 64Xoversampling
+  volatile uint32_t result1;
+  volatile uint32_t result2;
+
+  SDM sdm2;
+  beg = micros();
+  for (uint16_t i = 0; i < sampleRate; i++) {
+    result1 = sdm.o4_os32_df2(sig[i]);
+    result2 = sdm.o4_os32_df2(sig[i]);
+  }
+  Serial.println(micros() - beg);
 }
 
 void loop() {
