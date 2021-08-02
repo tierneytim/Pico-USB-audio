@@ -46,10 +46,10 @@ void setup() {
 
 
   // Set the appropriate clock
-  set_sys_clock_khz(153600, false);
+  set_sys_clock_khz(115200, false);
   uint offset = pio_add_program(pio, &pdm_program);
   sm = pio_claim_unused_sm(pio, true);
-  pdm_program_init(pio, sm, offset, 14, 153600 * 1000 / (48000.0 * 32));
+  pdm_program_init(pio, sm, offset, 14, 115200 * 1000 / (48000.0 * 32));
 
   USBAudio audio(true, 48000, 2, 48000, 2);
 
