@@ -9,14 +9,22 @@ This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It th
 </p>
 
 ## Table of contents
+0. [Preface](#pref)
 1. [Arduino Code](#a)
 2. [The Circuit](#b)
 3. [Building for pico-sdk](#c)
 
-<a name="a"></a>
-## Arduino mbed version
-An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Then run the code in the [mbedUSB folder](mbedUSB/mbedUSB.ino) or install the [Arduino library](SDM) in your Arduino libraries folder
+<a name="pref"></a>
+## Preface
+There are a couple of things to be aware of when using this library. 
+1. It overclocks (230.4 Mhz for 64 times oversampling) and underclocks (115.2 MHz for 32 X oversampling) the Pico.
+2. Sigma delta modulaters can get unstable and produce unpleasant sounds. 
+3. I won't guarantee this code won't blow up your favourite speakers or headphones (it shouldn't) but no guarantees.
 
+<a name="a"></a>
+## Arduino Mbed Code
+An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Then run the code in the [mbedUSB folder](mbedUSB/mbedUSB.ino) or install the [Arduino library](SDM) in your Arduino libraries folder. Then run the [mbedUSB example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB)  for 32 times oversampling and the [mbedUSB64 example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB64)
+for 64 times oversampling.
 <p align="center">
  <img src="README/board managerSearch.PNG" width="600" />
 </p
