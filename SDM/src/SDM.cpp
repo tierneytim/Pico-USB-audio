@@ -30,43 +30,55 @@ SDM::SDM() {
     return out;
   }
  
+uint32_t SDM::o1_os32(int16_t sig) {
 
- 
-  
-  // 64 X oversampling, direct form 2 
-/*   void SDM::o4_os64_df2(int16_t sig,uint32_t* output) {
-
-    //out64[0] = 0;
-    //out64[1] = 0;
-    
-    int32_t d = -98304 - sig; 
-    for(int i =0;i<2;i++){
-		
-		 uint32_t out =0;
-		for (int j = 0; j < 32; j++) {
+    uint32_t out = 0;
+    int32_t d = -32767 - sig;   
+    int32_t etmp;
+    for (int j = 0; j < 32; j++) {
+     etmp = d  +buff[0];
+     buff[0] = etmp;
       
-			// direct form 2 feedback
-			int32_t wn64 = d +4*(w64[0]+w64[2])-6*w64[1]-w64[3];
-			int32_t etmp = -3271 * w64[0] + 3986 * w64[1] - 2187 * w64[2] + 455 * w64[3]+wn64*1024;
+
+      
+      // checks if current error minises sum of squares error
+      // if not it changes the deltas and errors.
+      if (etmp < 0) {
+       buff[0] += 65534;
+       out += (1 << j);
+      }
+      
+    }
    
-			// update previous values
-			w64[3] = w64[2];
-			w64[2] = w64[1];
-			w64[1] = w64[0];
-			w64[0]= wn64;
-      
-			// checks if current error minises sum of squares error
-			if (etmp < 0) {
-				w64[0] += 196608;
-				out += (1 << j);
-			}
-		}
-		output[i]=out;
-	}
-	
+    return out;
   }
- */  
+
+ uint32_t SDM::o2_os32(int16_t sig) {
+
+    uint32_t out = 0;
+    int32_t d = -32767 - sig;   
+    int32_t etmp;
+    for (int j = 0; j < 32; j++) {
+     etmp = d  +2*buff[0]-buff[1];
+	 
+     buff[0] = etmp;
+      
+
+      
+      // checks if current error minises sum of squares error
+      // if not it changes the deltas and errors.
+      if (etmp < 0) {
+       buff[0] += 65534;
+       out += (1 << j);
+      }
+      
+    }
+   
+    return out;
+  }
+
   
+
   
     // oversample X 32(Direct form 1)
   uint32_t SDM::o4_os32(int16_t sig) {
