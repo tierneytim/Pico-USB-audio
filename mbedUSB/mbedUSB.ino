@@ -4,8 +4,8 @@
 #include "hardware/pll.h"
 #include "hardware/clocks.h"
 #include "pico/multicore.h"
-#include "Serial.h"
-#include "SDM.h"
+//#include "Serial.h"
+//#include "SDM.h"
 
 void set_sys_clock_pll(uint32_t vco_freq, uint post_div1, uint post_div2) {
   if (!running_on_fpga()) {
@@ -71,36 +71,29 @@ static inline bool set_sys_clock_khz(uint32_t freq_khz, bool required) {
 
 PIO pio = pio1;
 uint sm;
-
+//SDM sdm;
 void core1_worker() {
-  uint32_t a = pdm_4_os32(0);
-  uint32_t mute = 0;
-  int16_t pinput = 0;
+  uint32_t a = 0;
+  // uint32_t mute = 0;
+  //int16_t pinput = 0;
 
-  for (int i = -32767; i > 0; i++) {
-    a = pdm_4_os32(i);
-    pdm_write32(a, pio, sm);
-    pdm_write32(a, pio, sm);
-    pdm_write32(a, pio, sm);
-  }
-  SDM sdm;
+  // for (int i = -32767; i > 0; i++) {
+  //   a = pdm_4_os32(i);
+  //   pdm_write32(a, pio, sm);
+  //   pdm_write32(a, pio, sm);
+  //   pdm_write32(a, pio, sm);
+  // }
+
 
   while (1) {
-    if (pio_sm_is_tx_fifo_empty(pio, sm)) {
-      pio->txf[sm] = a;
-      pio->txf[sm] = a;
-      pio->txf[sm] = a;
-      pio->txf[sm] = a;
-      pio->txf[sm] = a;
-      pio->txf[sm] = a;
-      pio->txf[sm] = a;
-      pio->txf[sm] = a;
-    }
+    // if (pio_sm_is_tx_fifo_empty(pio, sm)) {
+    //   // pio->txf[sm] = a;
+    // }
     if (multicore_fifo_rvalid()) {
       uint32_t rec = multicore_fifo_pop_blocking();
-      pinput = (int16_t)(rec);
-      //a = pdm_4_os32(pinput);
-      a = sdm.o4_os32(pinput);
+      //pinput = (int16_t)(rec);
+      a = pdm_4_os32((int16_t)(rec));
+      //a = sdm.o4_os32(pinput);
 
       while (pio_sm_is_tx_fifo_full(pio, sm)) {}
       pio->txf[sm] = a;
@@ -116,8 +109,8 @@ void setup() {
   _gpio_init(23);
   gpio_set_dir(23, GPIO_OUT);
   gpio_put(23, 1);
-  _gpio_init(25);
-  gpio_set_dir(25, GPIO_OUT);
+  _gpio_init(14);
+  gpio_set_dir(14, GPIO_OUT);
 
   // Set the appropriate clock
   set_sys_clock_khz(115200, false);
@@ -128,7 +121,7 @@ void setup() {
   USBAudio audio(true, 48000, 2, 48000, 2);
 
   // variables
-  static uint8_t buf[64];
+  uint8_t buf[64];
   int16_t *in;
   int16_t outL;
   int16_t outR;
@@ -141,7 +134,7 @@ void setup() {
   while (1) {
     if (audio.read(buf, sizeof(buf))) {
       in = (int16_t *)buf;
-      gpio_put(25, 1);
+      //gpio_put(25, 1);
       for (int i = 0; i < 16; i++) {
         outL = *in;
         in++;
@@ -152,8 +145,8 @@ void setup() {
         pmono = mono;
       }
     } else {
-      multicore_fifo_push_blocking(pmono);
-      gpio_put(25, 0);
+      //multicore_fifo_push_blocking(pmono);
+      //gpio_put(25, 0);
     }
   }
 }
