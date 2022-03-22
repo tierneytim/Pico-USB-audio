@@ -13,7 +13,14 @@ void core1_worker() {
   uint32_t a = 0;
   int16_t pinput = 0;
   SDM sdm;
-
+  
+  //startup pop suppression
+  for(int i =-32767;i<0;i++){
+      a = sdm.o2_os32(i);
+      while (pio_sm_is_tx_fifo_full(pio, sm)) {}
+      pio->txf[sm] = a;
+  }
+  
   while (1) {
     //if fifo empty modulate the previous value to keep voltage constant
     // helps prevents clicks and pops I think
@@ -62,11 +69,8 @@ void setup() {
   // PIO configuration
   pio_sm_config c = pdm_program_get_default_config(offset);
   sm_config_set_out_pins(&c, 14, 1);
-  sm_config_set_sideset_pins(&c, 15);
-    
   pio_gpio_init(pio, 14);
-  pio_gpio_init(pio, 15);
-  pio_sm_set_consecutive_pindirs(pio, sm, 14, 2, true);
+  pio_sm_set_consecutive_pindirs(pio, sm, 14, 1, true);
   
   sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
   sm_config_set_clkdiv(&c, 115200 * 1000 / (48000.0 * 32));

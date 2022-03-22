@@ -60,7 +60,7 @@ uint32_t SDM::o1_os32(int16_t sig) {
     int32_t etmp;
     for (int j = 0; j < 32; j++) {
      etmp = d  +2*buff[0]-buff[1];
-	 
+	 buff[1] = buff[0];
      buff[0] = etmp;
       
 
