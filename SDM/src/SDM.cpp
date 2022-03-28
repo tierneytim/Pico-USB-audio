@@ -1,6 +1,10 @@
 #include "SDM.h"
 
 SDM::SDM() {
+    float dt = (2.0*PI/8000.0);
+    for (int i=0;i<8000;i++){
+        sina[i]=(int16_t)(sin(i*dt)*32767);
+    }
 }
 
  // oversample X 32(Direct form 2)
@@ -77,9 +81,6 @@ uint32_t SDM::o1_os32(int16_t sig) {
     return out;
   }
 
-  
-
-  
     // oversample X 32(Direct form 1)
   uint32_t SDM::o4_os32(int16_t sig) {
 
@@ -117,3 +118,18 @@ uint32_t SDM::o1_os32(int16_t sig) {
    
     return out;
   }
+
+void SDM::sine_set(float freq){
+    float dstep = freq*8000.0/48000.0;
+    step = (uint32_t)(dstep);
+    }
+
+uint32_t SDM::sine_mod(){
+  currentStep = currentStep +step;
+  if(currentStep>7999){
+    currentStep = currentStep-8000;
+  }
+  int16_t val =  sina[currentStep];
+  uint32_t out = o4_os32_df2(val);
+  return out;
+}

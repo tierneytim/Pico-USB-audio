@@ -6,15 +6,15 @@
 
 PIO pio = pio1;
 uint sm;
-
+SDM sdm;
 
 void core1_worker() {
   uint32_t a = 0;
   int16_t pinput = 0;
-  SDM sdm;
+
 
   //startup pop suppression
-  for(int i =-32767;i<0;i++){
+  for (int i = -32767; i < 0; i++) {
     a = sdm.o2_os32(i);
     while (pio_sm_is_tx_fifo_full(pio, sm)) {}
     pio->txf[sm] = a;
@@ -51,7 +51,7 @@ void core1_worker() {
   }
 }
 
-void pico_setup_48000_32(uint pin){
+void pico_setup_48000_32(uint pin) {
   // less noisy power supply
   _gpio_init(23);
   gpio_set_dir(23, GPIO_OUT);
@@ -73,38 +73,37 @@ void pico_setup_48000_32(uint pin){
   sm_config_set_out_shift(&c, true, true, 32);
   pio_sm_init(pio, sm, offset, &c);
   pio_sm_set_enabled(pio, sm, true);
-  multicore_launch_core1(core1_worker);   
+  multicore_launch_core1(core1_worker);
 }
 
 
 void setup() {
   // USB audio
- 
- uint8_t buf[96];
- int16_t *in;
- USBAudio audio(true, 48000, 2, 48000, 2);
- 
- //setup pin 14 to outut 
- pico_setup_48000_32(14);
 
- while(1){
-  if (audio.read(buf, sizeof(buf))) {
-    in = (int16_t *)buf;
-    for (int i = 0; i < 24; i++) {
-    // the left value;
-    int16_t outL = *in;
-    in++;
-    // the right value
-    int16_t outR = *in;
-    in++;
-    //mono value
-    int16_t mono = (outL + outR) / 2;
-    multicore_fifo_push_blocking((uint32_t)(mono));
+  uint8_t buf[96];
+  int16_t *in;
+  USBAudio audio(true, 48000, 2, 48000, 2);
+
+  //setup pin 14 to outut
+  pico_setup_48000_32(14);
+
+  while (1) {
+    if (audio.read(buf, sizeof(buf))) {
+      in = (int16_t *)buf;
+      for (int i = 0; i < 24; i++) {
+        // the left value;
+        int16_t outL = *in;
+        in++;
+        // the right value
+        int16_t outR = *in;
+        in++;
+        //mono value
+        int16_t mono = (outL + outR) / 2;
+        multicore_fifo_push_blocking((uint32_t)(mono));
+      }
     }
   }
- }
 }
 
 void loop() {
-
 }
