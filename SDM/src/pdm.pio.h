@@ -5,6 +5,8 @@
 #if !PICO_NO_HARDWARE
 #include "hardware/pio.h"
 #endif
+#include "SDM.h"
+#include "pico/multicore.h"
 
 // --- //
 // pdm //
@@ -124,6 +126,55 @@ static inline void pdm_write32(uint32_t sig, PIO pio, uint sm) {
   while (pio_sm_is_tx_fifo_full(pio, sm)) {}
   pio->txf[sm] = sig;
 }
+
+   PIO pio = pio1;
+ uint sm;
+ 
+void core1_worker() {
+  uint32_t a = 0;
+  int16_t pinput = 0;
+
+ SDM sdm;
+
+  //startup pop suppression
+  for (int i = -32767; i < 0; i++) {
+    a = sdm.o2_os32(i);
+    while (pio_sm_is_tx_fifo_full(pio, sm)) {}
+    pio->txf[sm] = a;
+  }
+
+  while (1) {
+    //if fifo empty modulate the previous value to keep voltage constant
+    // helps prevents clicks and pops I think
+
+    if (pio_sm_is_tx_fifo_empty(pio, sm)) {
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+    }
+    // if other core sends value
+    //if (false) {
+    if (multicore_fifo_rvalid()) {
+      uint32_t rec = multicore_fifo_pop_blocking();
+
+      //save previous value so we can stuff buffer with it if music paused.
+      pinput = (int16_t)(rec);
+      a = sdm.o4_os32_df2(pinput);
+      //a = sdm.o1_os32(pinput);
+
+      //write to state PIO when its not full
+      while (pio_sm_is_tx_fifo_full(pio, sm)) {}
+      pio->txf[sm] = a;
+    }
+  }
+}
+
+
 #endif
 
 #endif

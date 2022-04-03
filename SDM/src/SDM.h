@@ -11,7 +11,7 @@ public:
   uint32_t o4_os32(int16_t sig);
   uint32_t o4_os32_df2(int16_t sig); 
   void sine_set(float freq);
-  uint32_t sine_mod();
+  uint32_t sine_mod(uint32_t freq);
 
 private:
   int32_t buff[8] = { 0, 0, 0, 0 , 0, 0, 0, 0 };

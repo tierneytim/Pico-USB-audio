@@ -1,8 +1,8 @@
 #include "SDM.h"
 
 SDM::SDM() {
-    float dt = (2.0*PI/8000.0);
-    for (int i=0;i<8000;i++){
+    float dt = (2.0*PI/6000.0);
+    for (int i=0;i<6000;i++){
         sina[i]=(int16_t)(sin(i*dt)*32767);
     }
 }
@@ -11,7 +11,9 @@ SDM::SDM() {
   uint32_t SDM::o4_os32_df2(int16_t sig) {
 
     uint32_t out = 0;
-    int32_t d = -65536 - sig;   
+    int32_t d = -65536 - sig;
+    //int32_t bitmask=1;
+int32_t sign;    
     for (int j = 0; j < 32; j++) {
       
       // direct form 2 feedback
@@ -25,10 +27,11 @@ SDM::SDM() {
       w[0]= wn;
       
       // checks if current error minises sum of squares error
-      if (etmp < 0) {
-       w[0] += 131072;
+       //sign= (uint32_t)etmp>>31;
+       if(etmp<0){
+       w[0]+= 131072;
        out += (1 << j);
-      }
+       }
     }
    
     return out;
@@ -120,14 +123,15 @@ uint32_t SDM::o1_os32(int16_t sig) {
   }
 
 void SDM::sine_set(float freq){
-    float dstep = freq*8000.0/48000.0;
+    float dstep = freq*6000.0/48000.0;
     step = (uint32_t)(dstep);
     }
 
-uint32_t SDM::sine_mod(){
+uint32_t SDM::sine_mod(uint32_t freq){
+  step = freq >> 3;
   currentStep = currentStep +step;
-  if(currentStep>7999){
-    currentStep = currentStep-8000;
+  if(currentStep>5999){
+    currentStep = currentStep-6000;
   }
   int16_t val =  sina[currentStep];
   uint32_t out = o4_os32_df2(val);
