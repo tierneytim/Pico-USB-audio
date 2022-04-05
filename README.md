@@ -12,7 +12,8 @@ This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It th
 0. [Preface](#pref)
 1. [Arduino Code](#a)
 2. [The Circuit](#b)
-3. [Building for pico-sdk](#c)
+3. [Tones](#c)
+4. [Building for pico-sdk](#d)
 
 <a name="pref"></a>
 ## Preface
@@ -23,12 +24,30 @@ There are a couple of things to be aware of when using this library.
 
 <a name="a"></a>
 ## Arduino Mbed Code
-An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Then run the code in the [mbedUSB folder](mbedUSB/mbedUSB.ino) or install the [Arduino library](SDM) in your Arduino libraries folder. Then run the [mbedUSB example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB)  for 32 times oversampling and the [mbedUSB64 example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB64)
+An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Install the [Arduino library](SDM) in your Arduino libraries folder. Then run the [mbedUSB example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB)  for 32 times oversampling and the [mbedUSB64 example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB64)
 for 64 times oversampling.
-<p align="center">
- <img src="README/board managerSearch.PNG" width="600" />
-</p
 
+```cpp
+#include "pdmAudio.h"
+
+// PDM object
+pdmAudio pdm;
+
+void setup() {
+  // set pin 14 to be the output
+  pdm.begin(14);
+  
+  // intiate USB transfer
+  pdm.USB();
+}
+
+void loop() {
+   // write whatever is in the USB buffer to the PDM -DAC
+   pdm.USBwrite();
+}
+
+
+```
 <a name="b"></a>
 ## The Circuit
 The Circuit is pretty simple, it is composed of A lowpass filter at bout 20 KHz and a decoupling capactitor to removed the DC offset. The Output voltage is 1.6V peak-peak. This can be made approximately 1.1V peak to peak in software if that is preferable. 
@@ -43,8 +62,41 @@ and in reality it looks like this.
  <img src="README/realCircuit.jpg" width="600" />
 </p>
 
+<a name="c"></a>
+# Tones
+Tones can be played in a manner similar to the Tone library for arduino.
 
+```cpp
+#include "pdmAudio.h"
+
+// PDM object
+pdmAudio pdm;
+
+void setup() {
+  // set pin 14 to output
+  pdm.begin(14);
+}
+
+void loop() {
+  //each tone is governed by a frequency and duration(seconds)
+  pdm.tone(262, 0.25);
+  delay(165);
+  pdm.tone(196, 0.125);
+  delay(80);
+  pdm.tone(196, 0.125);
+  delay(80);
+  pdm.tone(220, 0.25);
+  delay(160);
+  pdm.tone(196, 0.25);
+  delay(160);
+  pdm.tone(0, 0.25);
+  delay(160); 
+  pdm.tone(247, 0.25);
+  delay(160);
+  pdm.tone(262, 0.25);
+  delay(1000);
+}
+```
 <a name="c"></a>
 # Building for pico-sdk
-I'm a Cmake Noob, so apologies in advance if the Cmake stuff doesn't work. If it doesn't please contribute better code. There is a [UF2 file](build) in the build folder if you want to just see what the library can do. Hold down the BOOTSEL button on the PICO, plug in over USB and then drag and drop the UF2 file into the drive that appears. 
-Follow this [guide](https://shawnhymel.com/2096/how-to-set-up-raspberry-pi-pico-c-c-toolchain-on-windows-with-vs-code/#Update_Environment_Variables) if you're building on windows. This is currently outlandishly complicated. If you want to help me simplify then please contribute.
+Cmake and pico USB became too hard to maintain. Arduino code is now all that is supported. 
