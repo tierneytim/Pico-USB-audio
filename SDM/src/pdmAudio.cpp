@@ -1,10 +1,65 @@
 #include "pdmAudio.h"
 #include "pdm.pio.h"
+#include "SDM.h"
+#include "pico/multicore.h"
+
+PIO pio = pio1;
+uint sm;
+
+void core1_worker() {
+  uint32_t a = 0;
+  int16_t pinput = 0;
+  
+  SDM sdm;
+
+  //startup pop suppression
+  for (int i = -32767; i < 0; i++) {
+    a = sdm.o2_os32(i);
+    while (pio_sm_is_tx_fifo_full(pio, sm)) {}
+    pio->txf[sm] = a;
+  }
+
+  while (1) {
+    //if fifo empty modulate the previous value to keep voltage constant
+    // helps prevents clicks and pops I think
+
+    if (pio_sm_is_tx_fifo_empty(pio, sm)) {
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+      pio->txf[sm] = a;
+    }
+    
+    // if other core sends value
+    if (multicore_fifo_rvalid()) {
+      uint32_t rec = multicore_fifo_pop_blocking();
+
+      //save previous value so we can stuff buffer with it if music paused.
+      pinput = (int16_t)(rec);
+      a = sdm.o4_os32_df2(pinput);
+      //a = sdm.o1_os32(pinput);
+
+      //write to state PIO when its not full
+      while (pio_sm_is_tx_fifo_full(pio, sm)) {}
+      pio->txf[sm] = a;
+    }
+  }
+}
+
 
 pdmAudio::pdmAudio() {
+  float delta = (2.0*PI/6000.0);
+    for (int i=0;i<6000;i++){
+        sina[i]=(int16_t)(sin(i*delta)*32767);
+    }
 }
 
 void pdmAudio::begin(uint pin) {
+  delay(1000);
 	// less noisy power supply
   _gpio_init(23);
   gpio_set_dir(23, GPIO_OUT);
@@ -27,9 +82,45 @@ void pdmAudio::begin(uint pin) {
   pio_sm_init(pio, sm, offset, &c);
   pio_sm_set_enabled(pio, sm, true);
   multicore_launch_core1(core1_worker);
+  delay(1000);
 }
+
+void pdmAudio::USB() {
+ audio= new USBAudio(true, 48000, 2, 48000, 2);
+}
+
+void pdmAudio::USBwrite() {
+     if (audio->read(myRawBuffer, sizeof(myRawBuffer))) {
+      int16_t *lessRawBuffer = (int16_t *)myRawBuffer;
+      for (int i = 0; i < 24; i++) {
+        // the left value;
+        int16_t outL = *lessRawBuffer;
+        lessRawBuffer++;
+        // the right value
+        int16_t outR = *lessRawBuffer;
+        lessRawBuffer++;
+        //mono value
+        int16_t mono = (outL + outR) / 2;
+        pdmAudio::write(mono);
+      }
+    }
+}
+
 void pdmAudio::write(int16_t mono) {
 	// less noisy power supply
     multicore_fifo_push_blocking((uint32_t)(mono));
 }
 
+void pdmAudio::tone(uint32_t freq, float duration){
+  step = freq >> 3;
+  nsamps = (uint32_t)(duration/dt);
+  for (int i = 0;i<nsamps;i++){
+  currentStep = currentStep +step;
+  if(currentStep>5999){
+    currentStep = currentStep-6000;
+  }
+  int16_t val =  sina[currentStep];
+  write(val);
+  }
+}
+  

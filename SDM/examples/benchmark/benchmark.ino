@@ -1,13 +1,10 @@
-#include "pdm.pio.h"
 #include "SDM.h"
-
-PIO pio = pio1;
-uint sm;
+#include "pdm.pio.h"
 const uint16_t sampleRate = 48000;
 int16_t sig[sampleRate];
 
 void setup() {
-
+delay(3000);
   // set new clock that is intger multiple of 48000*64
   uint32_t newClock = 230400;
   set_sys_clock_khz(newClock, false);
@@ -27,6 +24,13 @@ void setup() {
   // the class
   SDM sdm;
 
+
+// direct form 1 order 2;
+  beg = micros();
+  for (uint16_t i = 0; i < sampleRate; i++) {
+    result = sdm.o2_os32(sig[i]);
+  }
+  Serial.println(micros() - beg);
 
 
   // direct form 2;
