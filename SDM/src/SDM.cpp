@@ -9,8 +9,7 @@ SDM::SDM() {
 
     uint32_t out = 0;
     int32_t d = -65536 - sig;
-    //int32_t bitmask=1;
-int32_t sign;    
+    //int32_t bitmask=1;  
     for (int j = 0; j < 32; j++) {
       
       // direct form 2 feedback

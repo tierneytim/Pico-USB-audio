@@ -111,10 +111,37 @@ void pdmAudio::write(int16_t mono) {
     multicore_fifo_push_blocking((uint32_t)(mono));
 }
 
+void pdmAudio::USBtransfer(int16_t left,int16_t right) {
+  if(nBytes>95){
+    uint8_t *pcBuffer =  (uint8_t *)pcBuffer16;
+    audio->write(pcBuffer, 96);
+    pcCounter =0;
+    nBytes =0;
+  }
+  pcBuffer16[pcCounter]=left;
+  pcCounter++;
+  nBytes+=2;
+  
+  pcBuffer16[pcCounter]=right;
+  pcCounter++;
+  nBytes+=2;
+
+}
+
+int16_t pdmAudio::sine_lu(uint32_t freq){
+  step = freq >> 3;
+  currentStep = currentStep +step;
+  if(currentStep>5999){
+   currentStep = currentStep-6000;
+  }
+  int16_t val =  sina[currentStep];
+  return val;
+}
+
 void pdmAudio::tone(uint32_t freq, float duration){
   step = freq >> 3;
   nsamps = (uint32_t)(duration/dt);
-  for (int i = 0;i<nsamps;i++){
+  for (uint32_t i = 0;i<nsamps;i++){
   currentStep = currentStep +step;
   if(currentStep>5999){
     currentStep = currentStep-6000;
