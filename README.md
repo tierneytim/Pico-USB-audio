@@ -13,7 +13,8 @@ This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It th
 1. [Arduino Code](#a)
 2. [The Circuit](#b)
 3. [Tones](#c)
-4. [Building for pico-sdk](#d)
+4. [USB Microphones](#d)
+5. [Building for pico-sdk](#e)
 
 <a name="pref"></a>
 ## Preface
@@ -97,6 +98,30 @@ void loop() {
   delay(1000);
 }
 ```
-<a name="c"></a>
+
+<a name="d"></a>
+# USB microphones
+Microphone data  can be passed to the computer over USB using the following code. This test sends a 48O Hz sine wave over USB that can be monitored with a software such as Audacity.  
+
+```cpp
+#include "pdmAudio.h"
+
+pdmAudio pdm;
+
+void setup() {
+  pdm.USB();
+}
+
+void loop() {
+  // look up table sine-wave at 480 Hz
+  int16_t left = pdm.sine_lu(480);
+  int16_t right = left;
+  // write  stereo data to computer
+  pdm.USBtransfer(left, right);
+}
+
+```
+
+<a name="e"></a>
 # Building for pico-sdk
 Cmake and pico USB became too hard to maintain. Arduino code is now all that is supported. 

@@ -3,8 +3,6 @@
 pdmAudio pdm;
 
 void setup() {
-  // set pin 14 to be the output
-
   pdm.USB();
 }
 
