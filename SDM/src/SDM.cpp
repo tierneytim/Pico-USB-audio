@@ -5,11 +5,11 @@ SDM::SDM() {
 }
 
  // oversample X 32(Direct form 2)
-  uint32_t SDM::o4_os32_df2(int16_t sig) {
+uint32_t SDM::o4_os32_df2(int16_t sig) {
 
     uint32_t out = 0;
-    int32_t d = -65536 - sig;
-    //int32_t bitmask=1;  
+    int32_t d = vmin_04 - sig;
+    
     for (int j = 0; j < 32; j++) {
       
       // direct form 2 feedback
@@ -23,15 +23,20 @@ SDM::SDM() {
       w[0]= wn;
       
       // checks if current error minises sum of squares error
-       //sign= (uint32_t)etmp>>31;
        if(etmp<0){
-       w[0]+= 131072;
+       w[0]+= pos_error_04;
        out += (1 << j);
        }
     }
    
     return out;
   }
+
+void SDM::attenuate(uint16_t scale){
+ vmin_04 = -32767*scale;
+ pos_error_04 = 65534*scale; 
+}
+       
  
 uint32_t SDM::o1_os32(int16_t sig) {
 
