@@ -61,7 +61,12 @@ pdmAudio::pdmAudio() {
 void pdmAudio::begin(uint pin) {
   delay(1000);
 	// less noisy power supply
+  #ifdef ARDUINO_ARCH_MBED_RP2040 
   _gpio_init(23);
+  #else ARDUINO_ARCH_RP2040 
+  gpio_init(23);
+  #endif
+  
   gpio_set_dir(23, GPIO_OUT);
   gpio_put(23, 1);
 
@@ -86,10 +91,13 @@ void pdmAudio::begin(uint pin) {
 }
 
 void pdmAudio::USB() {
+ #ifdef ARDUINO_ARCH_MBED_RP2040
  audio= new USBAudio(true, 48000, 2, 48000, 2);
+ #endif
 }
 
 void pdmAudio::USBwrite() {
+    #ifdef ARDUINO_ARCH_MBED_RP2040
      if (audio->read(myRawBuffer, sizeof(myRawBuffer))) {
       int16_t *lessRawBuffer = (int16_t *)myRawBuffer;
       for (int i = 0; i < 24; i++) {
@@ -104,6 +112,7 @@ void pdmAudio::USBwrite() {
         pdmAudio::write(mono);
       }
     }
+    #endif
 }
 
 void pdmAudio::write(int16_t mono) {
@@ -111,7 +120,10 @@ void pdmAudio::write(int16_t mono) {
     multicore_fifo_push_blocking((uint32_t)(mono));
 }
 
+
+
 void pdmAudio::USBtransfer(int16_t left,int16_t right) {
+  #ifdef ARDUINO_ARCH_MBED_RP2040
   if(nBytes>95){
     uint8_t *pcBuffer =  (uint8_t *)pcBuffer16;
     audio->write(pcBuffer, 96);
@@ -125,7 +137,7 @@ void pdmAudio::USBtransfer(int16_t left,int16_t right) {
   pcBuffer16[pcCounter]=right;
   pcCounter++;
   nBytes+=2;
-
+  #endif
 }
 
 int16_t pdmAudio::sine_lu(uint32_t freq){
