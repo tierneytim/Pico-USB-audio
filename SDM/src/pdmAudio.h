@@ -2,7 +2,7 @@
 #define PDMAUDIO_H
 
 #include "Arduino.h"
-
+#include "SDM.h"
 #ifdef ARDUINO_ARCH_MBED_RP2040
 #include "mbed.h"
 #include "USBAudio.h"
@@ -24,9 +24,14 @@ public:
   int16_t sine_lu(uint32_t freq);
 
 private:
-#ifdef ARDUINO_ARCH_MBED_RP2040
+  #ifdef ARDUINO_ARCH_MBED_RP2040
   USBAudio* audio;
   #endif
+  
+  #ifdef ARDUINO_ARCH_ESP32
+  SDM sdm;
+  #endif
+  
   uint8_t myRawBuffer[96];
   int16_t pcBuffer16[48];
   uint16_t pcCounter=0;

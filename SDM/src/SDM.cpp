@@ -10,8 +10,13 @@ uint32_t SDM::o4_os32_df2(int16_t sig) {
     uint32_t out = 0;
     int32_t d = vmin_04 - sig;
     
+    #if defined ARDUINO_ARCH_MBED_RP2040 || defined ARDUINO_ARCH_RP2040 
     for (int j = 0; j < 32; j++) {
-      
+    #else
+    for (int j = 31; j > -1; j--) {
+    #endif
+    
+    
       // direct form 2 feedback
       int32_t wn = d +4*(w[0]+w[2])-6*w[1]-w[3];
       int32_t etmp = -3271 * w[0] + 3986 * w[1] - 2187 * w[2] + 455 * w[3]+wn*1024;
@@ -25,7 +30,7 @@ uint32_t SDM::o4_os32_df2(int16_t sig) {
       // checks if current error minises sum of squares error
        if(etmp<0){
        w[0]+= pos_error_04;
-       out += (1 << j);
+       out += (1 << (j));
        }
     }
    

@@ -1,5 +1,10 @@
 #include "pdmAudio.h"
-#include "SDM.h"
+//#include "SDM.h"
+
+#if defined ARDUINO_ARCH_ESP32
+#include "driver/i2s.h"
+#include "soc/rtc.h"
+#endif 
 
 #if defined ARDUINO_ARCH_MBED_RP2040 || defined ARDUINO_ARCH_RP2040 
 #include "pdm.pio.h"
@@ -90,8 +95,40 @@ void pdmAudio::begin(uint pin) {
   pio_sm_init(pio, sm, offset, &c);
   pio_sm_set_enabled(pio, sm, true);
   multicore_launch_core1(core1_worker);
-  delay(1000);
   #endif
+  
+  #ifdef ARDUINO_ARCH_ESP32
+    // i2s configuration
+  static const i2s_config_t i2s_config = {
+    .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX),
+    .sample_rate = 48000,
+    //.bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT, 
+    //.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,    
+    .communication_format = static_cast<i2s_comm_format_t>(I2S_COMM_FORMAT_I2S_MSB),
+    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // default interrupt priority
+    .dma_buf_count = 4,
+    .dma_buf_len = 24,
+    .use_apll = true,
+    .tx_desc_auto_clear = true,
+  };
+  
+  // i2s pinout
+  static const i2s_pin_config_t pin_config = {
+    .bck_io_num =22,//26
+    .ws_io_num = 19, //27
+    .data_out_num = 14, //25
+    .data_in_num = I2S_PIN_NO_CHANGE
+  };
+  
+  // now configure i2s with constructed pinout and config
+  i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
+  i2s_set_pin(I2S_NUM_0, &pin_config);
+  #endif   
+  
+  delay(1000);
+  
 }
 
 void pdmAudio::USB() {
@@ -123,9 +160,14 @@ void pdmAudio::write(int16_t mono) {
 	#if defined ARDUINO_ARCH_MBED_RP2040 || defined ARDUINO_ARCH_RP2040 
     multicore_fifo_push_blocking((uint32_t)(mono));
     #endif
+    
+    #if defined ARDUINO_ARCH_ESP32
+    uint32_t fy = sdm.o4_os32_df2(mono);
+    size_t bytes_written = 0;
+    i2s_write(I2S_NUM_0, (const char*)&fy, 4, &bytes_written,  10 );
+    #endif 
+    
 }
-
-
 
 void pdmAudio::USBtransfer(int16_t left,int16_t right) {
   #ifdef ARDUINO_ARCH_MBED_RP2040
