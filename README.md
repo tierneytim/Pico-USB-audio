@@ -135,6 +135,10 @@ MCU  | PDM | Tones | USB | Bluetooth
 ------------- | ------------- | ------------- | -------------| -------------
 RP2040  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :x:
 ESP32   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :heavy_check_mark:
+ESP32-S2   | :x: | :x:  | :x:  | :x:
+STM32  | :x:  | :x:  | :x: | :x:
+Feather M4   | :x: | :x: | :x:  | :x:
+Teensy 4.1   | :x:| :x:  | :x:  | :x:
 
 
  
