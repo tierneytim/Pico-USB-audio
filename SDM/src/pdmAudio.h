@@ -21,6 +21,7 @@ public:
   void USBwrite();
   void USBtransfer(int16_t left,int16_t right);
   void tone(uint32_t freq, float duration = 1.0);
+  void bluetooth();
   int16_t sine_lu(uint32_t freq);
 
 private:
