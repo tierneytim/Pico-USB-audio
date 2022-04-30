@@ -14,7 +14,8 @@ This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It th
 2. [The Circuit](#b)
 3. [Tones](#c)
 4. [USB Microphones](#d)
-5. [Building for pico-sdk](#e)
+5. [Other microcontrollers](#f)
+6. [Building for pico-sdk](#f)
 
 <a name="pref"></a>
 ## Preface
@@ -121,7 +122,23 @@ void loop() {
 }
 
 ```
-
 <a name="e"></a>
+# Other microcontrollers
+To support microcontrollers other than the RP2040 a few things are needed. 
+1. Fast multiplication and addition of 32-bit integers. 
+2. A peripheral that can create precisely timed, high frequency pulses (PIO on rp2040 or I2S on other controllers).
+3. A mechanism of audio acquisition (USB, Bluetooth, SD card).
+
+Currently the following features are supported for different controllers  
+
+MCU  | PDM | Tones | USB | Bluetooth
+------------- | ------------- | ------------- | -------------| -------------
+RP2040  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :x:
+ESP32   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :heavy_check_mark:
+
+
+ 
+
+<a name="f"></a>
 # Building for pico-sdk
 Cmake and pico USB became too hard to maintain. Arduino code is now all that is supported. 
