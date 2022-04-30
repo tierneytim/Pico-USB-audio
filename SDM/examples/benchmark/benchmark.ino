@@ -1,13 +1,9 @@
 #include "SDM.h"
-#include "pdm.pio.h"
 const uint16_t sampleRate = 48000;
 int16_t sig[sampleRate];
 
 void setup() {
 delay(3000);
-  // set new clock that is intger multiple of 48000*64
-  uint32_t newClock = 230400;
-  set_sys_clock_khz(newClock, false);
 
   //begin serial after clocks set
   Serial.begin(115200);

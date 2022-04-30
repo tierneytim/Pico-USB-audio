@@ -1,8 +1,9 @@
 #include "pdmAudio.h"
-#include "pdm.pio.h"
 #include "SDM.h"
-#include "pico/multicore.h"
 
+#if defined ARDUINO_ARCH_MBED_RP2040 || defined ARDUINO_ARCH_RP2040 
+#include "pdm.pio.h"
+#include "pico/multicore.h"
 PIO pio = pio1;
 uint sm;
 
@@ -49,6 +50,7 @@ void core1_worker() {
     }
   }
 }
+#endif
 
 
 pdmAudio::pdmAudio() {
@@ -63,10 +65,11 @@ void pdmAudio::begin(uint pin) {
 	// less noisy power supply
   #ifdef ARDUINO_ARCH_MBED_RP2040 
   _gpio_init(23);
-  #else ARDUINO_ARCH_RP2040 
+  #elif  defined ARDUINO_ARCH_RP2040 
   gpio_init(23);
   #endif
   
+  #if defined ARDUINO_ARCH_MBED_RP2040 || defined ARDUINO_ARCH_RP2040 
   gpio_set_dir(23, GPIO_OUT);
   gpio_put(23, 1);
 
@@ -88,6 +91,7 @@ void pdmAudio::begin(uint pin) {
   pio_sm_set_enabled(pio, sm, true);
   multicore_launch_core1(core1_worker);
   delay(1000);
+  #endif
 }
 
 void pdmAudio::USB() {
@@ -116,8 +120,9 @@ void pdmAudio::USBwrite() {
 }
 
 void pdmAudio::write(int16_t mono) {
-	// less noisy power supply
+	#if defined ARDUINO_ARCH_MBED_RP2040 || defined ARDUINO_ARCH_RP2040 
     multicore_fifo_push_blocking((uint32_t)(mono));
+    #endif
 }
 
 
