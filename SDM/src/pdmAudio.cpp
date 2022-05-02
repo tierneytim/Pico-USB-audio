@@ -10,26 +10,24 @@
 #include "esp_a2dp_api.h"
 SDM sdm2;
 void i2sCallback(const uint8_t *data, uint32_t len){
-  size_t i2s_bytes_write = 0; 
-  int16_t* data16=(int16_t*)data; //playData doesnt want const
-  int16_t fy[2];
+ size_t i2s_bytes_write = 0; 
+ int16_t* data16=(int16_t*)data; //playData doesnt want const
+ int16_t fy[2];
   
   
-  int jump =4; //how many bytes at a time get sent to buffer
-  int  n = len/jump; // number of byte chunks	
-        for(int i=0;i<n;i++){
-		 //process left channel
-		 fy[0] = (*data16);
-		 data16++;
+ int jump =4; //how many bytes at a time get sent to buffer
+ int  n = len/jump; // number of byte chunks	
+ for(int i=0;i<n;i++){
+  fy[0] = (*data16);
+  data16++;
 		 
-		 // process right channel
-		 fy[1] = (*data16);
-		 data16++;
-        int16_t mono = (fy[0]+fy[1])/2;
-        uint32_t fy2 = sdm2.o4_os32_df2(mono);
-        size_t bytes_written = 0;
-        i2s_write(I2S_NUM_0, (const char*)&fy2, 4, &bytes_written,  10 );
-        }
+  fy[1] = (*data16);
+  data16++;
+  int16_t mono = (fy[0]+fy[1])/2;
+  uint32_t fy2 = sdm2.o4_os32_df2(mono);
+  size_t bytes_written = 0;
+  i2s_write(I2S_NUM_0, (const char*)&fy2, 4, &bytes_written,  10 );
+  }
 }
 
 
@@ -78,14 +76,38 @@ void a2d_cb(esp_a2d_cb_event_t event, esp_a2d_cb_param_t*param){
 
 #include "pdm.pio.h"
 #include "pico/multicore.h"
-PIO pio = pio1;
-uint sm;
+
 
 void core1_worker() {
-  uint32_t a = 0;
-  int16_t pinput = 0;
-  
-  SDM sdm;
+ PIO pio = pio1;
+ uint sm;
+ 
+ // wait untill pin number is received
+ while(!multicore_fifo_rvalid()){     
+ }
+ uint32_t pin = multicore_fifo_pop_blocking();
+ 
+ // Set the appropriate clock
+ set_sys_clock_khz(115200, false);
+ uint offset = pio_add_program(pio, &pdm_program);
+ sm = pio_claim_unused_sm(pio, true);
+
+ // PIO configuration
+ pio_sm_config c = pdm_program_get_default_config(offset);
+ sm_config_set_out_pins(&c, pin, 1);
+ pio_gpio_init(pio, pin);
+ pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+ sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+ sm_config_set_clkdiv(&c, 115200 * 1000 / (48000.0 * 32));
+ sm_config_set_out_shift(&c, true, true, 32);
+ pio_sm_init(pio, sm, offset, &c);
+ pio_sm_set_enabled(pio, sm, true);
+    
+    
+ uint32_t a = 0;
+ int16_t pinput = 0;
+ SDM sdm;
 
   //startup pop suppression
   for (int i = -32767; i < 0; i++) {
@@ -146,33 +168,14 @@ void pdmAudio::begin(uint pin) {
   #if defined ARDUINO_ARCH_MBED_RP2040 || defined ARDUINO_ARCH_RP2040 
   gpio_set_dir(23, GPIO_OUT);
   gpio_put(23, 1);
-
-  // Set the appropriate clock
-  set_sys_clock_khz(115200, false);
-  uint offset = pio_add_program(pio, &pdm_program);
-  sm = pio_claim_unused_sm(pio, true);
-
-  // PIO configuration
-  pio_sm_config c = pdm_program_get_default_config(offset);
-  sm_config_set_out_pins(&c, pin, 1);
-  pio_gpio_init(pio, pin);
-  pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
-
-  sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
-  sm_config_set_clkdiv(&c, 115200 * 1000 / (48000.0 * 32));
-  sm_config_set_out_shift(&c, true, true, 32);
-  pio_sm_init(pio, sm, offset, &c);
-  pio_sm_set_enabled(pio, sm, true);
   multicore_launch_core1(core1_worker);
+  multicore_fifo_push_blocking((uint32_t)(pin));
   #endif
   
   #ifdef ARDUINO_ARCH_ESP32
-    // i2s configuration
   static const i2s_config_t i2s_config = {
     .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX),
     .sample_rate = 48000,
-    //.bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT, 
-    //.channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
     .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
     .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,    
     .communication_format = static_cast<i2s_comm_format_t>(I2S_COMM_FORMAT_I2S_MSB),
