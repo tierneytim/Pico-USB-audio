@@ -69,34 +69,42 @@ and in reality it looks like this.
 Tones can be played in a manner similar to the Tone library for arduino.
 
 ```cpp
-#include "pdmAudio.h"
+##include "pdmAudio.h"
 
 // PDM object
 pdmAudio pdm;
 
 void setup() {
-  // set pin 14 to output
   pdm.begin(14);
 }
 
 void loop() {
   //each tone is governed by a frequency and duration(seconds)
-  pdm.tone(262, 0.25);
-  delay(165);
+  // zero frequency keeps voltage constant
+  pdm.tone(262, .25);
+  pdm.tone(0, .165);
+
   pdm.tone(196, 0.125);
-  delay(80);
+  pdm.tone(0, .08);
+
   pdm.tone(196, 0.125);
-  delay(80);
+  pdm.tone(0, .08);
+
   pdm.tone(220, 0.25);
-  delay(160);
+  pdm.tone(0, .16);
+
   pdm.tone(196, 0.25);
-  delay(160);
+  pdm.tone(0, .16);
+  
   pdm.tone(0, 0.25);
-  delay(160); 
+  pdm.tone(0, .16);
+  
   pdm.tone(247, 0.25);
-  delay(160);
+  pdm.tone(0, .16);
+
   pdm.tone(262, 0.25);
-  delay(1000);
+  pdm.tone(0, 1);
+
 }
 ```
 
