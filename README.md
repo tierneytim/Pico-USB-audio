@@ -139,14 +139,14 @@ To support microcontrollers other than the RP2040 a few things are needed.
 
 Currently the following features are supported for different controllers  
 
-MCU  | PDM | Tones | USB | Bluetooth
-------------- | ------------- | ------------- | -------------| -------------
-RP2040  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :x:
-ESP32   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :heavy_check_mark:
-ESP32-S2   | :x: | :x:  | :x:  | :x:
-STM32  | :x:  | :x:  | :x: | :x:
-Feather M4   | :x: | :x: | :x:  | :x:
-Teensy 4.1   | :x:| :x:  | :x:  | :x:
+MCU  | PDM | Tones | USB | Bluetooth| CPU - 32x(%) | CPU - 64x(%)
+------------- | ------------- | ------------- | -------------| ------------- | ------------- | -------------
+RP2040  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :x: | 33% | 66%
+ESP32   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :heavy_check_mark: | 30% | 60%
+ESP32-S2   | :x: | :x:  | :x:  | :x: | NA | NA 
+STM32  | :x:  | :x:  | :x: | :x: | NA | NA
+Feather M4   | :x: | :x: | :x:  | :x: | NA | NA 
+Teensy 4.1   | :heavy_check_mark:| :x:  | :x:  | :x: | 5% | 10% 
 
 
  
