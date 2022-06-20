@@ -141,12 +141,12 @@ Currently the following features are supported for different controllers
 
 MCU  | PDM | Tones | USB | Bluetooth| CPU - 32x(%) | CPU - 64x(%)
 ------------- | ------------- | ------------- | -------------| ------------- | ------------- | -------------
-RP2040  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :x: | 33% | 66%
-ESP32   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :heavy_check_mark: | 30% | 60%
-ESP32-S2   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :x: | 30% | 60% 
-STM32  | :x:  | :x:  | :x: | :x: | NA | NA
+RP2040  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :x: | 33% | 66% - 230.4 MHz
+ESP32   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :heavy_check_mark: | 30% | 60% - 240 MHz
+ESP32-S2   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :x: | 30% | 60% - 240 MHz
+STM32  | :x:  | :x:  | :x: | :x: | 30% | 60% - 168 MHz
 Feather M4   | :x: | :x: | :x:  | :x: | NA | NA 
-Teensy 4.1   | :heavy_check_mark:| :x:  | :x:  | :x: | 5% | 10% 
+Teensy 4.1   | :heavy_check_mark:| :x:  | :x:  | :x: | 5% | 10% - 600 MHz
 
 
  
