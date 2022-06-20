@@ -1,6 +1,6 @@
 #include "pdmAudio.h"
 
-#if defined ARDUINO_ARCH_ESP32
+#if defined CONFIG_IDF_TARGET_ESP32
 
 #include "driver/i2s.h"
 #include "esp_bt.h"
