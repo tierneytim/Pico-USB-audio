@@ -8,26 +8,56 @@
 #include "esp_bt_device.h"
 #include "esp_gap_bt_api.h"
 #include "esp_a2dp_api.h"
-SDM sdm2;
-void i2sCallback(const uint8_t *data, uint32_t len){
- size_t i2s_bytes_write = 0; 
- int16_t* data16=(int16_t*)data; //playData doesnt want const
- int16_t fy[2];
-  
-  
- int jump =4; //how many bytes at a time get sent to buffer
- int  n = len/jump; // number of byte chunks	
- for(int i=0;i<n;i++){
-  fy[0] = (*data16);
-  data16++;
-		 
-  fy[1] = (*data16);
-  data16++;
-  int16_t mono = (fy[0]+fy[1])/2;
-  uint32_t fy2 = sdm2.o4_os32_df2(mono);
+
+QueueHandle_t queue;
+QueueHandle_t queue2;
+
+void Task1code(void* pvParameters) {
+  int16_t fy[2];
+  int16_t* rec;
+  int16_t length;
+  int16_t prev = 0;
   size_t bytes_written = 0;
-  i2s_write(I2S_NUM_0, (const char*)&fy2, 4, &bytes_written,  10 );
+  uint32_t ptime = 0;
+  SDM sdm2;
+
+  for (;;) {
+    bool ptrReceived = xQueueReceive(queue, &length, 0) == pdTRUE;
+    
+    if (ptrReceived) {
+      while (xQueueReceive(queue, &rec, portMAX_DELAY) != pdTRUE) {}
+      for (int i = 0; i < length; i++) {
+        fy[0] = *rec;
+        rec++;
+        fy[1] = *rec;
+        rec++;
+        int16_t mono = (fy[0] + fy[1]) / 2;
+        uint32_t fy2 = sdm2.o4_os32_df2(mono);
+        prev = mono;
+        i2s_write(I2S_NUM_0, (const char*)&fy2, 4, &bytes_written, 10);
+      }
+      int16_t done = 1;
+      xQueueSend(queue2, &done, 10);
+      ptime = micros();
+    }
+
+    if (!ptrReceived && ((micros() - ptime) > 6000)) {
+      for (int i = 0; i < 150; i++) {
+        uint32_t fy3 = sdm2.o4_os32_df2(prev);
+        i2s_write(I2S_NUM_0, (const char*)&fy3, 4, &bytes_written, 10);
+      }
+    }
   }
+}
+
+void i2sCallback(const uint8_t *data, uint32_t len){
+ int16_t* data16 = (int16_t*)data;  //playData doesnt want const
+ int jump = 4;                      //how many bytes at a time get sent to buffer
+ int16_t n = len / jump;            // number of byte chunks
+ xQueueSend(queue, &n, portMAX_DELAY);
+ xQueueSend(queue, &data16, portMAX_DELAY);
+ int16_t signal = 0;
+ xQueueReceive(queue2, &signal, portMAX_DELAY);
 }
 
 void a2d_cb(esp_a2d_cb_event_t event, esp_a2d_cb_param_t*param){
@@ -86,11 +116,11 @@ void pdmAudio::begin(uint pin) {
     .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
     .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,    
     .communication_format = static_cast<i2s_comm_format_t>(I2S_COMM_FORMAT_I2S_MSB),
-    .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // default interrupt priority
-    .dma_buf_count = 6,
-    .dma_buf_len = 80,
+    .intr_alloc_flags = 10, // default interrupt priority
+    .dma_buf_count = 2,
+    .dma_buf_len = 300,
     .use_apll = true,
-    .tx_desc_auto_clear = true,
+    .tx_desc_auto_clear = false,
   };
   
   // i2s pinout
@@ -171,6 +201,18 @@ void pdmAudio::bluetooth(){
   #else
   esp_bt_gap_set_scan_mode(ESP_BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE);
   #endif
+  queue = xQueueCreate(1, sizeof(int16_t*));
+  queue2 = xQueueCreate(1, sizeof(int16_t));
+  TaskHandle_t Task1;
+  xTaskCreatePinnedToCore(
+    Task1code, /* Task function. */
+    "Task1",   /* name of task. */
+    10000,     /* Stack size of task */
+    NULL,      /* parameter of the task */
+    10,        /* priority of the task */
+    &Task1,    /* Task handle to keep track of created task */
+    1);        /* pin task to core 0 */
+    delay(3000);
   esp_a2d_sink_register_data_callback(i2sCallback); 
 }
 #endif
