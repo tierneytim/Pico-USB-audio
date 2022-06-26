@@ -20,14 +20,13 @@ This library streams Audio over USB to Raspberry Pi Pico microcontrollers. It th
 <a name="pref"></a>
 ## Preface
 There are a couple of things to be aware of when using this library. 
-1. It overclocks (230.4 Mhz for 64 times oversampling) and underclocks (115.2 MHz for 32 X oversampling) the Pico.
+1. It  underclocks (115.2 MHz for 32 X oversampling) the Pico.
 2. Sigma delta modulaters can get unstable and produce unpleasant sounds. 
 3. I won't guarantee this code won't blow up your favourite speakers or headphones (it shouldn't) but no guarantees.
 
 <a name="a"></a>
 ## Arduino Mbed Code
-An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Install the [Arduino library](SDM) in your Arduino libraries folder. Then run the [mbedUSB example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB)  for 32 times oversampling and the [mbedUSB64 example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB64)
-for 64 times oversampling.
+An Arduino compatible USB sound card version is available. This code uses the official Arduino RP2040 core. This greatly simplifes the install and development process. The necessary mbed files can be easily installed with the Arduino board manager. Search "mbed rp2040" and install. Install the [Arduino library](SDM) in your Arduino libraries folder. Then run the [mbedUSB example](https://github.com/tierneytim/Pico-USB-audio/tree/main/SDM/examples/mbedUSB)  for 32 times oversampling.
 
 ```cpp
 #include "pdmAudio.h"
@@ -40,7 +39,7 @@ void setup() {
   pdm.begin(14);
   
   // intiate USB transfer
-  pdm.USB();
+  pdm.USB_UAC();
 }
 
 void loop() {
@@ -52,7 +51,7 @@ void loop() {
 ```
 <a name="b"></a>
 ## The Circuit
-The Circuit is pretty simple, it is composed of A lowpass filter at bout 20 KHz and a decoupling capactitor to removed the DC offset. The Output voltage is 1.6V peak-peak. This can be made approximately 1.1V peak to peak in software if that is preferable. 
+The Circuit is pretty simple, it is composed of A lowpass filter at bout 20 KHz and a decoupling capactitor to removed the DC offset. The Output voltage in the audible band is 1.1V peak-peak. 
 
 <p align="center">
  <img src="README/circuit (2).png" width="600" />
@@ -118,7 +117,7 @@ Microphone data  can be passed to the computer over USB using the following code
 pdmAudio pdm;
 
 void setup() {
-  pdm.USB();
+  pdm.USB_UAC();
 }
 
 void loop() {
@@ -145,7 +144,7 @@ RP2040  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :x: |
 ESP32   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :heavy_check_mark: | 30% | 60% - 240 MHz
 ESP32-S2   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :x: | 30% | 60% - 240 MHz
 STM32  | :heavy_check_mark:  | :x:  | :x: | :x: | 30% | 60% - 168 MHz
-Feather M4   | :x: | :x: | :x:  | :x: | NA | NA 
+Feather M4   | :heavy_check_mark: | :x: | :x:  | :x: | 22% | 44% - 200MHz 
 Teensy 4.1   | :heavy_check_mark:| :x:  | :x:  | :x: | 5% | 10% - 600 MHz
 
 
