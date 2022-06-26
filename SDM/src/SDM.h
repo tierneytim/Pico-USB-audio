@@ -1,7 +1,8 @@
 #ifndef PDMDAC_H
 #define PDMDAC_H
-#include "Arduino.h"
 
+#include <stdint.h>
+ 
 class SDM {
 public:
   //Constructor
@@ -22,6 +23,7 @@ private:
   
   
 };
+
 
 
 #endif

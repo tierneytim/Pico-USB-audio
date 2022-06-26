@@ -84,8 +84,8 @@ pdmAudio::pdmAudio() {
     }
 }
 
-void pdmAudio::begin(uint pin) {
-  delay(1000);
+void pdmAudio::begin(uint32_t pin) {
+  //delay(1000);
 	// less noisy power supply
   #ifdef ARDUINO_ARCH_MBED_RP2040 
   _gpio_init(23);
@@ -98,11 +98,11 @@ void pdmAudio::begin(uint pin) {
   multicore_launch_core1(core1_worker);
   multicore_fifo_push_blocking((uint32_t)(pin));
   
-  delay(1000);
+  //delay(1000);
   
 }
 
-void pdmAudio::USB() {
+void pdmAudio::USB_UAC() {
  #ifdef ARDUINO_ARCH_MBED_RP2040
  audio= new USBAudio(true, 48000, 2, 48000, 2);
  #endif
@@ -172,8 +172,6 @@ void pdmAudio::tone(uint32_t freq, float duration){
   }
 }
 
-void pdmAudio::bluetooth(){
 
-}
 
 #endif

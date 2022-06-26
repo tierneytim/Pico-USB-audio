@@ -12,14 +12,11 @@ pdmAudio::pdmAudio() {
     }
 }
 
-void pdmAudio::begin(uint pin) {
-  delay(1000);
-  
-  delay(1000);
-  
+void pdmAudio::begin(uint32_t pin) {
+
 }
 
-void pdmAudio::USB() {
+void pdmAudio::USB_UAC() {
 
 }
 

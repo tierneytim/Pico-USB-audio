@@ -3,7 +3,7 @@
 pdmAudio pdm;
 
 void setup() {
-  pdm.USB();
+  pdm.USB_UAC();
 }
 
 void loop() {

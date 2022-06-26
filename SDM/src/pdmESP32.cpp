@@ -106,9 +106,8 @@ pdmAudio::pdmAudio() {
     }
 }
 
-void pdmAudio::begin(uint pin) {
-  delay(1000);
-
+void pdmAudio::begin(uint32_t pin) {
+  
   
   static const i2s_config_t i2s_config = {
     .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX),
@@ -135,17 +134,8 @@ void pdmAudio::begin(uint pin) {
   i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL);
   i2s_set_pin(I2S_NUM_0, &pin_config);
 
-  delay(1000);
-  
 }
 
-void pdmAudio::USB() {
-
-}
-
-void pdmAudio::USBwrite() {
-
-}
 
 void pdmAudio::write(int16_t mono) {
     
@@ -154,8 +144,6 @@ void pdmAudio::write(int16_t mono) {
     i2s_write(I2S_NUM_0, (const char*)&fy, 4, &bytes_written,  10 );
 }
 
-void pdmAudio::USBtransfer(int16_t left,int16_t right) {
-}
 
 int16_t pdmAudio::sine_lu(uint32_t freq){
   step = freq >> 3;

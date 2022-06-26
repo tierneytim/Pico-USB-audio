@@ -1,6 +1,6 @@
 #include "pdmAudio.h"
 
-#if defined(__IMXRT1052__) || defined(__IMXRT1062__)
+#if defined(__SAMD51__)
 
 
 
@@ -14,7 +14,6 @@ pdmAudio::pdmAudio() {
 
 void pdmAudio::begin(uint32_t pin) {
 
-  
 }
 
 void pdmAudio::USB_UAC() {

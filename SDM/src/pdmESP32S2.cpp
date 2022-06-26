@@ -13,8 +13,8 @@ pdmAudio::pdmAudio() {
     }
 }
 
-void pdmAudio::begin(uint pin) {
-  delay(1000);
+void pdmAudio::begin(uint32_t pin) {
+  //delay(1000);
 
   
   static const i2s_config_t i2s_config = {
@@ -42,11 +42,11 @@ void pdmAudio::begin(uint pin) {
   Serial.println(i2s_driver_install(I2S_NUM_0, &i2s_config, 0, NULL));
   Serial.println(i2s_set_pin(I2S_NUM_0, &pin_config));
 
-  delay(1000);
+  //delay(1000);
   
 }
 
-void pdmAudio::USB() {
+void  pdmAudio::USB_UAC() {
 
 }
 
@@ -87,7 +87,4 @@ void pdmAudio::tone(uint32_t freq, float duration){
   }
 }
 
-void pdmAudio::bluetooth(){
-
-}
 #endif
