@@ -8,8 +8,10 @@ SDM::SDM() {
 uint32_t SDM::o4_os32_df2(int16_t sig) {
 
     uint32_t out = 0;
-    int32_t d = vmin_04 - sig;
+    int32_t d = vmin_04 - sig; // vmin_o4  = -32767*3, therefore output is 3.3v/3 = 1.1v pk-pk
     int32_t test = vmin_04*1024;
+    
+    // depends on software whether LSB or MSB should be determined first
     #if defined ARDUINO_ARCH_MBED_RP2040 || defined ARDUINO_ARCH_RP2040 
     for (int j = 0; j < 32; j++) {
     #else
@@ -18,8 +20,7 @@ uint32_t SDM::o4_os32_df2(int16_t sig) {
     
       int32_t wn =d+4*(w[0]+w[2])-6*w[1]-w[3];
       // direct form 2 feedback
-      int32_t etmp = -3271 * w[0] + 3986 * w[1] - 2187 * w[2] + 455 * w[3]+1024*wn;
-     
+      int32_t etmp = -3035 * w[0] + 3477 * w[1] - 1809 * w[2] + 359 * w[3]+1024*wn;
       // update previous values
       w[3] = w[2];
       w[2] = w[1];
