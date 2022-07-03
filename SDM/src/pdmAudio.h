@@ -30,8 +30,7 @@ class pdmAudio {
    #ifdef ARDUINO_ARCH_MBED_RP2040
    USBAudio* audio;
    #endif
-  
-   #ifdef ARDUINO_ARCH_ESP32
+   #if defined(ARDUINO_ARCH_ESP32) || defined(__SAMD51__)
    SDM sdm;
    #endif
   
