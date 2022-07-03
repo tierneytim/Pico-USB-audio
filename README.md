@@ -144,7 +144,7 @@ RP2040  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :x: |
 ESP32   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :heavy_check_mark: | 30% | 60% - 240 MHz
 ESP32-S2   | :heavy_check_mark: | :heavy_check_mark:  | :x:  | :x: | 30% | 60% - 240 MHz
 STM32  | :heavy_check_mark:  | :x:  | :x: | :x: | 30% | 60% - 168 MHz
-Feather M4   | :heavy_check_mark: | :x: | :x:  | :x: | 22% | 44% - 200MHz 
+Feather M4   | :heavy_check_mark: | :heavy_check_mark: | :x:  | :x: | 22% | 44% - 200MHz 
 Teensy 4.1   | :heavy_check_mark:| :x:  | :x:  | :x: | 5% | 10% - 600 MHz
 
 
