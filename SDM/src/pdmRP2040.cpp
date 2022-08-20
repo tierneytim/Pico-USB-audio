@@ -78,13 +78,15 @@ void core1_worker() {
 
 
 pdmAudio::pdmAudio() {
-  float delta = (2.0*PI/6000.0);
-    for (int i=0;i<6000;i++){
-        sina[i]=(int16_t)(sin(i*delta)*32767);
-    }
+ 
 }
 
 void pdmAudio::begin(uint32_t pin) {
+    
+     float delta = (2.0*PI/6000.0);
+    for (int i=0;i<6000;i++){
+        sina[i]=(int16_t)(sin(i*delta)*32767);
+    }
   //delay(1000);
 	// less noisy power supply
   #ifdef ARDUINO_ARCH_MBED_RP2040 
