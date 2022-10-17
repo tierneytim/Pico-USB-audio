@@ -3,6 +3,7 @@
 pdmAudio pdm;
 
 void setup() {
+  pdm.begin(14);
   pdm.USB_UAC();
 }
 
